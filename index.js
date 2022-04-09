@@ -8,16 +8,24 @@ const postsRoute = require("./routes/posts");
 const categoriesRoute = require("./routes/categories");
 const multer = require("multer");
 const path = require("path");
+const cors = require("cors");
 
 dotenv.config();
 app.use(express.json());
+
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
   })
   .then(console.log("Application is connected to the MongoDB"))
   .catch((err) => console.log(err));
+
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
