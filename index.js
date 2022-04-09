@@ -48,6 +48,6 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   res.status(200).json("File has been uploaded!!");
 });
 
-app.listen("5000", () => {
+app.listen(process.env.PORT || "5000", () => {
   console.log("Appilication is running on port 5000");
 });
