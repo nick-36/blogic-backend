@@ -32,11 +32,12 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/posts", postsRoute);
 app.use("/api/categories", categoriesRoute);
+
 app.use("/images", express.static(path.join(__dirname, "/images")));
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "/api/Images");
+    cb(null, "/public/images");
   },
   filename: function (req, file, cb) {
     cb(null, req.body.name);
