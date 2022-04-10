@@ -12,7 +12,7 @@ const cors = require("cors");
 
 dotenv.config();
 app.use(express.json());
-
+app.use("/images", express.static(path.join(__dirname, "/images")));
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -21,25 +21,11 @@ mongoose
   .then(console.log("Application is connected to the MongoDB"))
   .catch((err) => console.log(err));
 
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
-
-app.use("/api/auth", authRoute);
-app.use("/api/users", usersRoute);
-app.use("/api/posts", postsRoute);
-app.use("/api/categories", categoriesRoute);
-
-app.use("/images", express.static(path.join(__dirname, "/public/images")));
-
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "/public/images");
+  destination: (req, file, cb) => {
+    cb(null, "images");
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     cb(null, req.body.name);
   },
 });
@@ -49,6 +35,18 @@ const upload = multer({ storage: storage });
 app.post("/api/upload", upload.single("file"), (req, res) => {
   res.status(200).json("File has been uploaded!!");
 });
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+app.use("/api/auth", authRoute);
+app.use("/api/users", usersRoute);
+app.use("/api/posts", postsRoute);
+app.use("/api/categories", categoriesRoute);
 
 app.listen(process.env.PORT || "5000", () => {
   console.log("Appilication is running on port 5000");
