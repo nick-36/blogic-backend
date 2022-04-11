@@ -38,7 +38,7 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://blogic-client.netlify.app",
     credentials: true,
   })
 );
