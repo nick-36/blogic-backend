@@ -14,6 +14,9 @@ const PostSchema = new mongoose.Schema(
       type: "String",
       required: false,
     },
+    cloudinary_id: {
+      type: "String",
+    },
     username: {
       type: "String",
       required: true,

@@ -9,9 +9,11 @@ const categoriesRoute = require("./routes/categories");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const { cloudinary } = require("./utils/cloudinary");
 
 dotenv.config();
 app.use(express.json());
+app.use(cors());
 app.use("/images", express.static(path.join(__dirname, "/images")));
 mongoose
   .connect(process.env.MONGO_URL, {
@@ -21,27 +23,19 @@ mongoose
   .then(console.log("Application is connected to the MongoDB"))
   .catch((err) => console.log(err));
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, req.body.name);
-  },
+app.post("/api/upload", async (req, res) => {
+  try {
+    const fileStr = req.body.data;
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+      upload_preset: "ml_default",
+    });
+
+    res.status(200).json(uploadResponse);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err: "Something went wrong" });
+  }
 });
-
-const upload = multer({ storage: storage });
-
-app.post("/api/upload", upload.single("file"), (req, res) => {
-  res.status(200).json("File has been uploaded!!");
-});
-
-app.use(
-  cors({
-    origin: "https://blogic-client.netlify.app",
-    credentials: true,
-  })
-);
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
