@@ -1,13 +1,10 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
-const cloudinary = require("../utils/cloudinary");
-const upload = require("../utils/multer");
 
 //Create Post
 
 router.post("/", async (req, res) => {
-  console.log(req.body);
   const newPost = new Post(req.body);
 
   try {
