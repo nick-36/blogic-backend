@@ -1,10 +1,11 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
+const { verifyToken, verifyTokenAndAuthor } = require("./verify");
 
 //Create Post
 
-router.post("/", async (req, res) => {
+router.post("/", verifyTokenAndAuthor, async (req, res) => {
   const newPost = new Post(req.body);
 
   try {
@@ -17,7 +18,7 @@ router.post("/", async (req, res) => {
 
 //Update Post
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", verifyTokenAndAuthor, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post.username === req.body.username) {
@@ -43,10 +44,12 @@ router.put("/:id", async (req, res) => {
 
 //Delete Post
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verifyTokenAndAuthor, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.username === req.body.username) {
+    const user = await User.find({ username: post.username });
+    console.log(user[0]._id.toString(), req.body.id);
+    if (user[0]._id.toString() === req.body.id) {
       try {
         await post.delete();
         res.status(200).json("Post has been deleted....");

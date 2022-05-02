@@ -1,6 +1,7 @@
 // import { Router } from 'express';
 const router = require("express").Router();
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { default: mongoose } = require("mongoose");
 
@@ -26,16 +27,21 @@ module.exports = router;
 
 //Login Route
 
+const createToken = (user, secretKey) => {
+  const Token = jwt.sign({ id: user._id, username: user.username }, secretKey);
+  return Token;
+};
+
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     !user && res.status(400).json("Wrong Credentials!!");
-
+    console.log(user);
     const validated = await bcrypt.compare(req.body.password, user.password);
     !validated && res.status(400).json("Wrong Credentials!!");
-
+    const accessToken = createToken(user, process.env.JWT_SECRET);
     const { password, ...others } = user._doc;
-    res.status(200).json(others);
+    res.status(200).json({ ...others, accessToken });
   } catch (error) {
     res.status(500).json(error);
   }
